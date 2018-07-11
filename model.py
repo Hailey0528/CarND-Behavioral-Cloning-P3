@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 lines = []
-with open('../../Documents/data/data/driving_log.csv') as csvfile:
+with open('../../ubuntu/data/data/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
@@ -20,7 +20,7 @@ for line in lines:
 	measurement = float(line[3])
 	source_path = line[0]
 	filename = source_path.split('/')[-1]
-	current_path = '../../Documents/data/data/IMG/'+filename
+	current_path = '../../ubuntu/data/data/IMG/'+filename
 	image = cv2.imread(current_path)
 	images.append(image)	
 	measurements.append(measurement)
@@ -107,9 +107,9 @@ model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='valid', W_regul
 model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
 model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
 model.add(Flatten())
-model.add(Dense(100), W_regularizer=l2(0.01))
-model.add(Dense(50), W_regularizer=l2(0.01))
-model.add(Dense(10), W_regularizer=l2(0.01))
+model.add(Dense(100, W_regularizer=l2(0.01)))
+model.add(Dense(50, W_regularizer=l2(0.01)))
+model.add(Dense(10, W_regularizer=l2(0.01)))
 model.add(Dense(1))
 #model.add(Activation('softmax'))
 
