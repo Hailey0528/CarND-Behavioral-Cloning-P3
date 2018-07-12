@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 lines = []
-with open('../../ubuntu/data/data/driving_log.csv') as csvfile:
+with open('../../ubuntu/data/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
@@ -17,42 +17,43 @@ print(len(lines))
 images = []
 measurements = []
 for line in lines:
-	measurement = float(line[3])
+	delta_angle = 0.2
+	angle = float(line[3])
+
+	#####for the central camera#####
 	source_path = line[0]
 	filename = source_path.split('/')[-1]
-	current_path = '../../ubuntu/data/data/IMG/'+filename
+	current_path = '../../ubuntu/data/IMG/'+filename
 	image = cv2.imread(current_path)
 	images.append(image)	
-	measurements.append(measurement)
+	measurements.append(angle)
 	image_flip = np.fliplr(image)
 	images.append(image_flip)
-	measurements.append(measurement*-1)
+	measurements.append(-angle)
 
 
 	#####for the left camera#####
-	#source_path = line[1] 
-	#filename = source_path.split('/')[-1]
-	#current_path = '../../ubuntu/data/data/IMG/'+filename
-	#image_left = cv2.imread(current_path)
-	#image_left = np.array(image_left)
-	#images.append(image_left)
-	#measurements.append(angle+delta_angle)
+	source_path = line[1] 
+	filename = source_path.split('/')[-1]
+	current_path = '../../ubuntu/data/IMG/'+filename
+	image_left = cv2.imread(current_path)
+	images.append(image_left)
+	measurements.append(angle+delta_angle)
 	#flip the image and save the image and relative steering angle
-
-	#images.append(cv2.flip(image_left, 1))
-	#measurements.append(-delta_angle-angle)
+	images.append(np.fliplr(image_left))
+	measurements.append(-delta_angle-angle)
 
 	#####for the right camera#####
-	#source_path = line[2] 
-	#filename = source_path.split('/')[-1]
-	#current_path = '../../ubuntu/data/data/IMG/'+filename
-	#image_right = cv2.imread(current_path)
-	#image_right = np.array(image_right)
-	#images.append(image_right)
-	#measurements.append(angle-delta_angle)
+	source_path = line[2] 
+	filename = source_path.split('/')[-1]
+	current_path = '../../ubuntu/data/IMG/'+filename
+	image_right = cv2.imread(current_path)
+	images.append(image_right)
+	measurements.append(angle-delta_angle)
 	#flip the image and save the image and relative steering angle
-	#images.append(cv2.flip(image_right, 1))
-	#measurements.append(-angle+delta_angle)
+	images.append(np.fliplr(image_right))
+	measurements.append(-angle+delta_angle)
+
 print(len(images))
 
 def cropping(img):
@@ -95,21 +96,28 @@ from keras.regularizers import l2, activity_l2
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
+sigma = 0.01
+rate_dropout = 0.5
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
-model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
+model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 #model.add(MaxPooling2D((2, 2)))
-#model.add(Dropout(0.5))
-model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
+model.add(Dropout(0.5))
+model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 #model.add(MaxPooling2D((2, 2)))
-model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
+model.add(Dropout(0.5))
+model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 #model.add(MaxPooling2D((2, 2)))
-model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
-model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(0.01), activation='relu'))
+model.add(Dropout(0.5))
+model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
+model.add(Dropout(0.5))
+model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
+model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(100, W_regularizer=l2(0.01)))
-model.add(Dense(50, W_regularizer=l2(0.01)))
-model.add(Dense(10, W_regularizer=l2(0.01)))
+model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(1))
 #model.add(Activation('softmax'))
 
