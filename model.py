@@ -2,6 +2,7 @@ import csv
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 from PIL import Image
 
 lines = []
@@ -88,8 +89,43 @@ X_train = np.array(preprocessing(images))
 print(X_train.shape)
 y_train = np.array(measurements)
 
+##### show visualzition of data, preprocessing #####
+#show the distribution of training data
+Angle_Min = min(y_train)
+Angle_Max = max(y_train)
+iteration = 0.04 
+Angle_range = np.arange(Angle_Min, Angle_Max+iteration, iteration)
+Length_range = len(Angle_range)
+Number_eachRange = np.zeros(Length_range-1)
+for angle in y_train:
+	for i in range(Length_range-1):
+		if angle >= Angle_range[i] and angle<=Angle_range[i+1]:
+			Number_eachRange[i] += 1
 
-# model architecture
+# show the distribution of classes in the training
+Distribution = plt.figure()
+plt.bar(Angle_range[1:]*25, Number_eachRange)
+plt.title('Distribution')
+plt.xlabel('number of class')
+plt.ylabel('number of images')
+Distribution.savefig('image/Angle_Distribution.jpg')
+
+# show the flipping image
+image_flip, (ax1, ax2) = plt.subplots(1, 2)
+image2=np.fliplr(image_right)
+ax1.imshow(image_right)
+ax2.imshow(image2)
+image_flip.savefig('image/flipping.jpg')
+
+# show the image after preprocessing
+image_flip, (ax1, ax2) = plt.subplots(1, 2)
+image3=cropping(image)
+image4=resizing(image3)
+ax1.imshow(image)
+ax2.imshow(image4)
+image_flip.savefig('image/Preprocessing.jpg')
+
+##### model architecture#####
 from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
 from keras.regularizers import l2, activity_l2
@@ -97,31 +133,32 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.01
-rate_dropout = 0.5
+rate_dropout = 0.2
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(MaxPooling2D((2, 2)))
-model.add(Dropout(0.5))
+#model.add(Dropout(rate_dropout))
 model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(MaxPooling2D((2, 2)))
-model.add(Dropout(0.5))
+#model.add(Dropout(rate_dropout))
 model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(MaxPooling2D((2, 2)))
-model.add(Dropout(0.5))
-model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
-model.add(Dropout(0.5))
-model.add(Convolution2D(64, 3, 3, border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
-model.add(Dropout(0.5))
+#model.add(Dropout(rate_dropout))
+model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
+#model.add(Dropout(rate_dropout))
+model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
+#model.add(Dropout(rate_dropout))
 model.add(Flatten())
+#model.add(Dropout(rate_dropout))
 model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-model.add(Dropout(0.2))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(1))
 #model.add(Activation('softmax'))
 
+##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=7, batch_size=32)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=50, batch_size=256)
 
 model.save('model.h5')
