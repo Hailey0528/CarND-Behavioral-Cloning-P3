@@ -123,5 +123,6 @@ After the collection process, I had 48216 number of data points. I then preproce
 
 
 I finally randomly shuffled the data set and put 20% of the data into a validation set. 
+With the initial model in 5 Epochs I got training loss with 0.0230 and validation loss 0.0254. I tried to add a dropout layer of 20% in the last fully connected layer. After 5 epochs, the training loss is 0.0255 and the validation loss is 0.0238. Then I tried to add dropout in every layer, after 5 epochs, the training loss is 0.0226 and the validation loss is 0.0242. Sigma is 0.005, 0.0418/0.0413
 
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
