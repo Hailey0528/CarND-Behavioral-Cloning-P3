@@ -1,11 +1,3 @@
-# **Behavioral Cloning** 
-
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
 **Behavioral Cloning Project**
 
 This project is using convolutional neural network to predict the steering angle of a car. The CNN architecture from NVIDIA for End to End Learning for Self-Driving Cars is the initial architecture. Dropout is added to avoid the overfitting. With the trained model the car can drive well in the Udacity Simulator.
