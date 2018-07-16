@@ -25,6 +25,7 @@ This project is using convolutional neural network to predict the steering angle
 #### 1. An appropriate model architecture has been employed
 
 I used CNN architecture of NVIDIA for End to End Learning for Self-Driving Cars. The input of the model is The model consists of a convolution neural network with 5x5, 3x3 filter sizes and depths between 24 and 64 (model.py lines 18-24) 
+![alt text][image1]
 
 The model includes RELU layers to introduce nonlinearity (code line 139-155), and the data is normalized in the model using a Keras lambda layer (code line 138). 
 
@@ -40,53 +41,28 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 #### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
-
-For details about how I created the training data, see the next section. 
+Training data was chosen to keep the vehicle driving on the road. I only used center lane driving data, which can already make the car drive very well on the road.
 
 ### Model Architecture and Training Strategy
 
 #### 1. Solution Design Approach
+I added relus, weights regularizer, bias regularizer in every layer of the NVIDIA architecture. Then dropout is added to avoid overfitting. I tried to add drop in every layer and add it only in the last fully connected layer. It shows that the loss is lower with only dropout in the last fully connected layer, which I have tried in the last project Traffic Sign Classification. 
 
-The overall strategy for deriving a model architecture was to ...
+I choose validation split with 0.2 in order to let the validation result to check the model. After trying to tune the parameter of weights and bias regularizer and choosing the dropout layer, I run the model for 50 epochs in order to find the optimal epochs number.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
-
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
-
-To combat the overfitting, I modified the model so that ...
-
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
-
-#### 2. Final Model Architecture
-
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
-
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
+The final step was to run the simulator to see how well the car was driving around track one. The car was driving very well on the track even when the set speed is 25 km/h without leaving the road. 
 
 #### 3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
-
-Then I repeated this process on track two in order to get more data points.
-I used the data set of Udacity at first. The images from left and right camera are also used in order to increase the data number. To augment the data sat, I also flipped images and angles thinking that this would add more steering angle data. For example, here is an image that has then been flipped:
-
+I used the data set of Udacity at first. I also tried to get data with the simulator. But since the car drives very well, there is no need to add more images. The images from left and right camera are also used in order to increase the data number. To augment the data sat, I also flipped images and angles thinking that this would add more steering angle data. For example, here is an image that has then been flipped:
 ![alt text][image2]
-![alt text][image3]
+
+After the collection process, I had 48216 number of data points. This is the distribution of steering angles of the data.
 ![alt text][image4]
 
-After the collection process, I had 48216 number of data points. I then preprocessed this data by cropping, resizing each image and converting the image from BGR to YUV, because the input of architecture from NVIDIA is YUV image. 
+I then preprocessed this data by cropping, resizing each image and converting the image from BGR to YUV, because the input of architecture from NVIDIA is YUV image. Here is a example of image which has been preprocessed.
+![alt text][image3]
 
+I finally randomly shuffled the data set and put 20% of the data into a validation set. With the initial model in 5 Epochs I got training loss with 0.0230 and validation loss 0.0254. Then I tried to add dropout in every layer, after 5 epochs, the training loss is 0.0226 and the validation loss is 0.0242. The validation loss is higher than the training loss, which means there is overfitting. Then I tried to add a dropout layer of 20% in the last fully connected layer. After 5 epochs, the training loss is 0.0255 and the validation loss is 0.0238. I also changed the Sigma from 0.001 to 0.005, the training and validation loss becomes double as before.Therefore, I chose sigma with 0.001, and just add dropout in the last fully connected layer.
 
-I finally randomly shuffled the data set and put 20% of the data into a validation set. 
-Batch size is 256, 
-With the initial model in 5 Epochs I got training loss with 0.0230 and validation loss 0.0254. I tried to add a dropout layer of 20% in the last fully connected layer. After 5 epochs, the training loss is 0.0255 and the validation loss is 0.0238. Then I tried to add dropout in every layer, after 5 epochs, the training loss is 0.0226 and the validation loss is 0.0242. I also changed the Sigma from 0.001 to 0.005, the training and validation loss becomes double as before.Therefore, I chose sigma with 0.001, and just add dropout in the last fully connected layer.
-Then I tried to add some data which are by myself.
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. Then I tried 50 epochs with this architecture, then I found in the 31th epoch the result is good. I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I used this training data for training the model. Then I tried 50 epochs with this architecture, then I found in the 17th epoch the result is the best. I used an adam optimizer so that manually training the learning rate wasn't necessary.
