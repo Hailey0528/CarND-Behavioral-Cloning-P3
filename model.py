@@ -132,7 +132,7 @@ from keras.regularizers import l2, activity_l2
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
-sigma = 0.01
+sigma = 0.001
 rate_dropout = 0.2
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
@@ -153,12 +153,11 @@ model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activatio
 model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 #model.add(Dropout(rate_dropout))
 model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(Dropout(rate_dropout))
+model.add(Dropout(rate_dropout))
 model.add(Dense(1))
-#model.add(Activation('softmax'))
 
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=50, batch_size=256)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=17)
 
 model.save('model.h5')
