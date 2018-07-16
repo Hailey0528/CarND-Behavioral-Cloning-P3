@@ -8,41 +8,34 @@
 
 **Behavioral Cloning Project**
 
-The goals / steps of this project are the following:
-* Use the simulator to collect data of good driving behavior
-* Build, a convolution neural network in Keras that predicts steering angles from images
-* Train and validate the model with a training and validation set
-* Test that the model successfully drives around track one without leaving the road
-* Summarize the results with a written report
+This project is using convolutional neural network to predict the steering angle of a car. The CNN architecture from NVIDIA for End to End Learning for Self-Driving Cars is the initial architecture. Dropout is added to avoid the overfitting. With the trained model the car can drive well in the Udacity Simulator.
 
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./image/Angle_Distribution.jpg "Angle_Distribution.jpg"
-[image5]: ./image/flipping.jpg "flipping"
-[image6]: ./image/Preprocessing.jpg "Preprocessing"
+
+[image1]: ./image/Angle_Distribution.jpg "Angle_Distribution.jpg"
+[image2]: ./image/flipping.jpg "flipping"
+[image3]: ./image/Preprocessing.jpg "Preprocessing"
 
 
 ### Model Architecture and Training Strategy
 
 #### 1. An appropriate model architecture has been employed
 
-I used CNN architecture of NVIDIA for End to End Learning for Self-Driving Cars. The input of the model is The model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+I used CNN architecture of NVIDIA for End to End Learning for Self-Driving Cars. The input of the model is The model consists of a convolution neural network with 5x5, 3x3 filter sizes and depths between 24 and 64 (model.py lines 18-24) 
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+The model includes RELU layers to introduce nonlinearity (code line 139-155), and the data is normalized in the model using a Keras lambda layer (code line 138). 
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+The model contains dropout layers in order to reduce overfitting (model.py lines 158). 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 161). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 #### 3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 161).
 
 #### 4. Appropriate training data
 
@@ -80,19 +73,12 @@ Here is a visualization of the architecture (note: visualizing the architecture 
 
 To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
 
-![alt text][image2]
-
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
-
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
 Then I repeated this process on track two in order to get more data points.
 I used the data set of Udacity at first. The images from left and right camera are also used in order to increase the data number. To augment the data sat, I also flipped images and angles thinking that this would add more steering angle data. For example, here is an image that has then been flipped:
 
-![alt text][image6]
-![alt text][image7]
+![alt text][image1]
+![alt text][image2]
+![alt text][image3]
 
 After the collection process, I had 48216 number of data points. I then preprocessed this data by cropping, resizing each image and converting the image from BGR to YUV, because the input of architecture from NVIDIA is YUV image. 
 
