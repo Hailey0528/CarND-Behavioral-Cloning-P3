@@ -1,6 +1,6 @@
-#**Behavioral Cloning Project**
+# **Behavioral Cloning Project**
 
-## This project is using convolutional neural network to predict the steering angle of a car. The CNN architecture from NVIDIA for End to End Learning for Self-Driving Cars is the initial architecture. Dropout is added to avoid the overfitting. With the trained model the car can drive well in the Udacity Simulator.
+#### This project is using convolutional neural network to predict the steering angle of a car. The CNN architecture from NVIDIA for End to End Learning for Self-Driving Cars is the initial architecture. Dropout is added to avoid the overfitting. With the trained model the car can drive well in the Udacity Simulator.
 
 
 [//]: # (Image References)
