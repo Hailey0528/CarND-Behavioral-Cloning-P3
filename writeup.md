@@ -7,8 +7,8 @@
 
 
 [image1]: ./image/CNN_Architecture.png "NVIDIA.jpg"
-[image2]: ./image/flipping.jpg "flipping"
-[image3]: ./image/Preprocessing.jpg "Preprocessing"
+[image2]: ./image/flipping.png "flipping"
+[image3]: ./image/Preprocessing.png "Preprocessing"
 [image4]: ./image/Angle_Distribution.jpg "Angle_Distribution.jpg"
 
 
