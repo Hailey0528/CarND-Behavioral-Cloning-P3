@@ -14,9 +14,10 @@ This project is using convolutional neural network to predict the steering angle
 [//]: # (Image References)
 
 
-[image1]: ./image/Angle_Distribution.jpg "Angle_Distribution.jpg"
+[image1]: ./image/CNN_Architecture.png "NVIDIA.jpg"
 [image2]: ./image/flipping.jpg "flipping"
 [image3]: ./image/Preprocessing.jpg "Preprocessing"
+[image4]: ./image/Angle_Distribution.jpg "Angle_Distribution.jpg"
 
 
 ### Model Architecture and Training Strategy
@@ -76,9 +77,9 @@ To capture good driving behavior, I first recorded two laps on track one using c
 Then I repeated this process on track two in order to get more data points.
 I used the data set of Udacity at first. The images from left and right camera are also used in order to increase the data number. To augment the data sat, I also flipped images and angles thinking that this would add more steering angle data. For example, here is an image that has then been flipped:
 
-![alt text][image1]
 ![alt text][image2]
 ![alt text][image3]
+![alt text][image4]
 
 After the collection process, I had 48216 number of data points. I then preprocessed this data by cropping, resizing each image and converting the image from BGR to YUV, because the input of architecture from NVIDIA is YUV image. 
 
