@@ -111,13 +111,12 @@ I then recorded the vehicle recovering from the left side and right sides of the
 ![alt text][image3]
 ![alt text][image4]
 ![alt text][image5]
+
 Then I repeated this process on track two in order to get more data points.
 I used the data set of Udacity at first. The images from left and right camera are also used in order to increase the data number. To augment the data sat, I also flipped images and angles thinking that this would add more steering angle data. For example, here is an image that has then been flipped:
 
 ![alt text][image6]
 ![alt text][image7]
-
-
 
 After the collection process, I had 48216 number of data points. I then preprocessed this data by cropping, resizing each image and converting the image from BGR to YUV, because the input of architecture from NVIDIA is YUV image. 
 
