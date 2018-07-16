@@ -16,7 +16,7 @@
 
 #### 1. An appropriate model architecture has been employed
 
-I used CNN architecture of NVIDIA for End to End Learning for Self-Driving Cars. The input of the model is YUV image with size of 66x220x3. The model consists of a convolution neural network with 5x5, 3x3 filter sizes and depths between 24 and 64 (model.py lines 18-24), and 4 fully connected layers as in the following image: 
+I used CNN architecture of NVIDIA for End to End Learning for Self-Driving Cars.(from paper: End to End Learning for Self-Driving Cars.) The input of the model is YUV image with size of 66x220x3. The model consists of a convolution neural network with 5x5, 3x3 filter sizes and depths between 24 and 64 (model.py lines 18-24), and 4 fully connected layers as in the following image: 
 ![alt text][image1]
 
 The model includes RELU layers to introduce nonlinearity (model.py line 139-155), and the data is normalized in the model using a Keras lambda layer (model.py line 138). 
