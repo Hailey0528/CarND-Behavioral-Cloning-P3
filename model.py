@@ -6,6 +6,7 @@ plt.switch_backend('agg')
 from PIL import Image
 
 lines = []
+### get the informations from csv file of data of Udacity
 with open('../../ubuntu/data/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
@@ -14,7 +15,7 @@ with open('../../ubuntu/data/driving_log.csv') as csvfile:
 
 print(len(lines))
 
-#get images
+def image_reading(lines, fileName):
 images = []
 measurements = []
 for line in lines:
