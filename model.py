@@ -7,54 +7,81 @@ from PIL import Image
 
 lines = []
 ### get the informations from csv file of data of Udacity
-with open('../../ubuntu/data/driving_log.csv') as csvfile:
+with open('../../Ubuntu/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
-
+# print the number of the lines
 print(len(lines))
 
-def image_reading(lines, fileName):
-	images = []
-	measurements = []
-	for line in lines:
-		delta_angle = 0.2
-		angle = float(line[3])
+# calculate the number of the images in the Undacity data
+length_original = len(lines)
 
-		#####for the central camera#####
-		source_path = line[0]
-		filename = source_path.split('/')[-1]
-		current_path = '../../ubuntu/data/IMG/'+filename
-		image = cv2.imread(current_path)
+### get the informations from csv file of added data 
+with open('../../Ubuntu/data3/driving_log.csv') as csvfile:
+    reader = csv.reader(csvfile)
+    for line in reader:
+        lines.append(line)
+
+# print the number of the total lines
+print(len(lines))
+
+### read the images with the folderName and the information 
+### for example, the name of image from the central camera, left camera, right camera, the sterring angle. 
+### read every image and flip the image, and 
+def image_flip(line, folderName):
+	delta_angle = 0.2
+	angle = float(line[3])
+	#####for the central camera#####
+	source_path = line[0]
+	filename = source_path.split('/')[-1]
+	current_path = folderName + filename
+	image = cv2.imread(current_path)
+	if image is not None:		
+		
 		images.append(image)	
 		measurements.append(angle)
 		image_flip = np.fliplr(image)
 		images.append(image_flip)
 		measurements.append(-angle)
 
+	#####for the left camera#####
+	source_path = line[1] 
+	filename = source_path.split('/')[-1]
+	current_path = folderName + filename
+	image_left = cv2.imread(current_path)
+	if image_left is not None:
 
-		#####for the left camera#####
-		source_path = line[1] 
-		filename = source_path.split('/')[-1]
-		current_path = '../../ubuntu/data/IMG/'+filename
-		image_left = cv2.imread(current_path)
+		
 		images.append(image_left)
 		measurements.append(angle+delta_angle)
 		#flip the image and save the image and relative steering angle
 		images.append(np.fliplr(image_left))
 		measurements.append(-delta_angle-angle)
 
-		#####for the right camera#####
-		source_path = line[2] 
-		filename = source_path.split('/')[-1]
-		current_path = '../../ubuntu/data/IMG/'+filename
-		image_right = cv2.imread(current_path)
+	#####for the right camera#####
+	source_path = line[2] 
+	filename = source_path.split('/')[-1]
+	current_path = folderName + filename
+	image_right = cv2.imread(current_path)
+	if image_right is not None:		
 		images.append(image_right)
 		measurements.append(angle-delta_angle)
 		#flip the image and save the image and relative steering angle
 		images.append(np.fliplr(image_right))
 		measurements.append(-angle+delta_angle)
+
+
+images = []
+measurements = []
+
+for line in lines[:length_original]:
+	image_flip(line, '../../Ubuntu/IMG/')
+print(len(images))
+
+for line in lines[length_original:]:
+	image_flip(line, '../../Ubuntu/data3/IMG/')
 
 print(len(images))
 
