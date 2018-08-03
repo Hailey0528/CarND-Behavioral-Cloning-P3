@@ -7,7 +7,7 @@ from PIL import Image
 
 lines = []
 ### get the informations from csv file of data of Udacity
-with open('../../Ubuntu/driving_log.csv') as csvfile:
+with open('../../ubuntu/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
@@ -19,7 +19,7 @@ print(len(lines))
 length_original = len(lines)
 
 ### get the informations from csv file of added data 
-with open('../../Ubuntu/data3/driving_log.csv') as csvfile:
+with open('../../ubuntu/data3/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -77,11 +77,11 @@ images = []
 measurements = []
 
 for line in lines[:length_original]:
-	image_flip(line, '../../Ubuntu/IMG/')
+	image_flip(line, '../../ubuntu/IMG/')
 print(len(images))
 
 for line in lines[length_original:]:
-	image_flip(line, '../../Ubuntu/data3/IMG/')
+	image_flip(line, '../../ubuntu/data3/IMG/')
 
 print(len(images))
 
@@ -137,21 +137,6 @@ plt.title('Distribution')
 plt.xlabel('number of class')
 plt.ylabel('number of images')
 Distribution.savefig('image/Angle_Distribution.jpg')
-
-# show the flipping image
-image_flip, (ax1, ax2) = plt.subplots(1, 2)
-image2=np.fliplr(image_right)
-ax1.imshow(image_right)
-ax2.imshow(image2)
-image_flip.savefig('image/flipping.jpg')
-
-# show the image after preprocessing
-image_flip, (ax1, ax2) = plt.subplots(1, 2)
-image3=cropping(image)
-image4=resizing(image3)
-ax1.imshow(image)
-ax2.imshow(image4)
-image_flip.savefig('image/Preprocessing.jpg')
 
 ##### model architecture#####
 from keras.models import Sequential, Model
