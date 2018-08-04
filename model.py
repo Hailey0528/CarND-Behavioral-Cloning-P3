@@ -93,26 +93,42 @@ def image_flip(line, folderName):
 def image_flip_central(line, folderName):
 	delta_angle = 0.2
 	angle = float(line[3])
+	
+	#####for the left camera#####
+	source_path = line[1] 
+	# get the image name from the csv file
+	filename = source_path.split('/')[-1]
+        # create the path of the image
+	current_path = folderName + filename
+	# read the image	
+	image_left = cv2.imread(current_path)
+	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
+	if image_left is not None:
+                # save the image data from left camera and the steering angle
+		images.append(image_left)
+		measurements.append(angle+delta_angle)
+		#flip the image from left camera and save the image and corresponding steering angle
+		images.append(np.fliplr(image_left))
+		measurements.append(-delta_angle-angle)
 
-	#####for the central camera#####
-	source_path = line[0]
+	#####for the right camera#####
+	source_path = line[2] 
 	# get the image name from the csv file
 	filename = source_path.split('/')[-1]
 	# create the path of the image
 	current_path = folderName + filename
 	# read the image
-	image = cv2.imread(current_path)
-	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-	# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-	if image is not None:			
-		# save the image data from central camera and the steering angle
-		images.append(image)	
-		measurements.append(angle)
-		# flip the image from central camera
-		image_flip = np.fliplr(image)
-		# save the flipped image data and the corresponding steering angle
-		images.append(image_flip)
-		measurements.append(-angle)
+	image_right = cv2.imread(current_path)
+        # If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
+	if image_right is not None:		
+		# save the image data from right camera and the steering angle
+		images.append(image_right)
+		measurements.append(angle-delta_angle)
+		#flip the image from right camera and save the image and corresponding steering angle
+		images.append(np.fliplr(image_right))
+		measurements.append(-angle+delta_angle)
 		
 images = []
 measurements = []
