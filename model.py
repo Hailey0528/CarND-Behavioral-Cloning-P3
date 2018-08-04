@@ -19,7 +19,7 @@ print(len(lines))
 length_original = len(lines)
 
 ### get the informations from csv file of added data 
-with open('../../ubuntu/data3/driving_log.csv') as csvfile:
+with open('../../ubuntu/added_data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -33,60 +33,79 @@ print(len(lines))
 def image_flip(line, folderName):
 	delta_angle = 0.2
 	angle = float(line[3])
+
 	#####for the central camera#####
 	source_path = line[0]
+	# get the image name from the csv file
 	filename = source_path.split('/')[-1]
+	# create the path of the image
 	current_path = folderName + filename
+	# read the image
 	image = cv2.imread(current_path)
-	if image is not None:		
-		
+	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+	# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
+	if image is not None:			
+		# save the image data from central camera and the steering angle
 		images.append(image)	
 		measurements.append(angle)
+		# flip the image from central camera
 		image_flip = np.fliplr(image)
+		# save the flipped image data and the corresponding steering angle
 		images.append(image_flip)
 		measurements.append(-angle)
 
 	#####for the left camera#####
 	source_path = line[1] 
+	# get the image name from the csv file
 	filename = source_path.split('/')[-1]
+        # create the path of the image
 	current_path = folderName + filename
+	# read the image	
 	image_left = cv2.imread(current_path)
+	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
 	if image_left is not None:
-
-		
+                # save the image data from left camera and the steering angle
 		images.append(image_left)
 		measurements.append(angle+delta_angle)
-		#flip the image and save the image and relative steering angle
+		#flip the image from left camera and save the image and corresponding steering angle
 		images.append(np.fliplr(image_left))
 		measurements.append(-delta_angle-angle)
 
 	#####for the right camera#####
 	source_path = line[2] 
+	# get the image name from the csv file
 	filename = source_path.split('/')[-1]
+	# create the path of the image
 	current_path = folderName + filename
+	# read the image
 	image_right = cv2.imread(current_path)
+        # If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
 	if image_right is not None:		
+		# save the image data from right camera and the steering angle
 		images.append(image_right)
 		measurements.append(angle-delta_angle)
-		#flip the image and save the image and relative steering angle
+		#flip the image from right camera and save the image and corresponding steering angle
 		images.append(np.fliplr(image_right))
 		measurements.append(-angle+delta_angle)
 
 
 images = []
 measurements = []
-
+# save the image data from Udacity and the steering angle, the flipped image of the original image should also be saved
 for line in lines[:length_original]:
 	image_flip(line, '../../ubuntu/IMG/')
 print(len(images))
 
+# save the image data with the simulator by myself and the steering angle, the flipped image of the original image should also be saved
 for line in lines[length_original:]:
-	image_flip(line, '../../ubuntu/data3/IMG/')
+	image_flip(line, '../../ubuntu/added_data/IMG/')
 
 print(len(images))
 
 def cropping(img):
-	#cropping the image for important informations
+	#cropping the image for important informations with the number of pixels, which should be cropped in every side
 	number_top = 50
 	number_bottom = 20 
 	number_left = 0 
@@ -96,7 +115,7 @@ def cropping(img):
 	return img_crop
 
 def resizing(img):
-	#resize the image
+	#resize the image, with new size (new_width, new_height)
 	new_height = 66
 	new_width = 220
 	img_resize = cv2.resize(img, (new_width,new_height))
@@ -106,15 +125,18 @@ def preprocessing(img):
 	image_Preprocessing = []
 	n_training = len(img)
 	for i in range(n_training):
+		# for every image, crop the iamge
 		image = cropping(img[i])
+		# resize the image
 		image = resizing(image)
+		# change the BGR image to YUV image
 		image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+		# save the image to the array for image data set
 		image_Preprocessing.append(image)		
 	return image_Preprocessing
 
 #get the input train and validation data, and the expected output of the model
 X_train = np.array(preprocessing(images))
-print(X_train.shape)
 y_train = np.array(measurements)
 
 ##### show visualzition of data, preprocessing #####
