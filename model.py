@@ -90,7 +90,30 @@ def image_flip(line, folderName):
 		images.append(np.fliplr(image_right))
 		measurements.append(-angle+delta_angle)
 
+def image_flip_central(line, folderName):
+	delta_angle = 0.2
+	angle = float(line[3])
 
+	#####for the central camera#####
+	source_path = line[0]
+	# get the image name from the csv file
+	filename = source_path.split('/')[-1]
+	# create the path of the image
+	current_path = folderName + filename
+	# read the image
+	image = cv2.imread(current_path)
+	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+	# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
+	if image is not None:			
+		# save the image data from central camera and the steering angle
+		images.append(image)	
+		measurements.append(angle)
+		# flip the image from central camera
+		image_flip = np.fliplr(image)
+		# save the flipped image data and the corresponding steering angle
+		images.append(image_flip)
+		measurements.append(-angle)
+		
 images = []
 measurements = []
 # save the image data from Udacity and the steering angle, the flipped image of the original image should also be saved
@@ -100,7 +123,7 @@ print(len(images))
 
 # save the image data with the simulator by myself and the steering angle, the flipped image of the original image should also be saved
 for line in lines[length_original:]:
-	image_flip(line, '../../ubuntu/added_data/IMG/')
+	image_flip_central(line, '../../ubuntu/added_data/IMG/')
 
 print(len(images))
 
