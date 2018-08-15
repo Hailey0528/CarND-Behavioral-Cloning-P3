@@ -153,7 +153,7 @@ Distribution.savefig('image/Angle_Distribution.jpg')
 ##### model architecture#####
 
 sigma = 0.001
-rate_dropout = 0.5
+rate_dropout = 0.2
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
