@@ -1,9 +1,12 @@
 import csv
 import cv2
+import pandas
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 from PIL import Image
+
 
 lines = []
 ### get the informations from csv file of data of Udacity
@@ -14,18 +17,7 @@ with open('../../ubuntu/driving_log.csv') as csvfile:
         lines.append(line)
 # print the number of the lines
 print(len(lines))
-
-# calculate the number of the images in the Undacity data
-length_original = len(lines)
-
-### get the informations from csv file of added data 
-with open('../../ubuntu/added_data/driving_log.csv') as csvfile:
-    reader = csv.reader(csvfile)
-    for line in reader:
-        lines.append(line)
-
-# print the number of the total lines
-print(len(lines))
+#colnames = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
 
 ### read the images with the folderName and the information 
 ### for example, the name of image from the central camera, left camera, right camera, the sterring angle. 
@@ -53,94 +45,48 @@ def image_flip(line, folderName):
 		# save the flipped image data and the corresponding steering angle
 		images.append(image_flip)
 		measurements.append(-angle)
-
-	#####for the left camera#####
-	source_path = line[1] 
-	# get the image name from the csv file
-	filename = source_path.split('/')[-1]
-        # create the path of the image
-	current_path = folderName + filename
-	# read the image	
-	image_left = cv2.imread(current_path)
-	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-	if image_left is not None:
-                # save the image data from left camera and the steering angle
-		images.append(image_left)
-		measurements.append(angle+delta_angle)
-		#flip the image from left camera and save the image and corresponding steering angle
-		images.append(np.fliplr(image_left))
-		measurements.append(-delta_angle-angle)
-
-	#####for the right camera#####
-	source_path = line[2] 
-	# get the image name from the csv file
-	filename = source_path.split('/')[-1]
-	# create the path of the image
-	current_path = folderName + filename
-	# read the image
-	image_right = cv2.imread(current_path)
-        # If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-	if image_right is not None:		
-		# save the image data from right camera and the steering angle
-		images.append(image_right)
-		measurements.append(angle-delta_angle)
-		#flip the image from right camera and save the image and corresponding steering angle
-		images.append(np.fliplr(image_right))
-		measurements.append(-angle+delta_angle)
-
-def image_flip_central(line, folderName):
-	delta_angle = 0.2
-	angle = float(line[3])
-	
-	#####for the left camera#####
-	source_path = line[1] 
-	# get the image name from the csv file
-	filename = source_path.split('/')[-1]
-        # create the path of the image
-	current_path = folderName + filename
-	# read the image	
-	image_left = cv2.imread(current_path)
-	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-	if image_left is not None:
-                # save the image data from left camera and the steering angle
-		images.append(image_left)
-		measurements.append(angle+delta_angle)
-		#flip the image from left camera and save the image and corresponding steering angle
-		images.append(np.fliplr(image_left))
-		measurements.append(-delta_angle-angle)
-
-	#####for the right camera#####
-	source_path = line[2] 
-	# get the image name from the csv file
-	filename = source_path.split('/')[-1]
-	# create the path of the image
-	current_path = folderName + filename
-	# read the image
-	image_right = cv2.imread(current_path)
-        # If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-        # flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-	if image_right is not None:		
-		# save the image data from right camera and the steering angle
-		images.append(image_right)
-		measurements.append(angle-delta_angle)
-		#flip the image from right camera and save the image and corresponding steering angle
-		images.append(np.fliplr(image_right))
-		measurements.append(-angle+delta_angle)
+	if angle<-0.15:
+		#####for the left camera#####
+		source_path = line[1] 
+		# get the image name from the csv file
+		filename = source_path.split('/')[-1]
+		# create the path of the image
+		current_path = folderName + filename
+		# read the image	
+		image_left = cv2.imread(current_path)
+		# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+		# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
+		if image_left is not None:
+			# save the image data from left camera and the steering angle
+			images.append(image_left)
+			measurements.append(angle+delta_angle)
+			#flip the image from left camera and save the image and corresponding steering angle
+			images.append(np.fliplr(image_left))
+			measurements.append(-delta_angle-angle)
+	if angle>0.15:
+		#####for the right camera#####
+		source_path = line[2] 
+		# get the image name from the csv file
+		filename = source_path.split('/')[-1]
+		# create the path of the image
+		current_path = folderName + filename
+		# read the image
+		image_right = cv2.imread(current_path)
+		# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
+		# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
+		if image_right is not None:		
+			# save the image data from right camera and the steering angle
+			images.append(image_right)
+			measurements.append(angle-delta_angle)
+			#flip the image from right camera and save the image and corresponding steering angle
+			images.append(np.fliplr(image_right))
+			measurements.append(-angle+delta_angle)
 		
 images = []
 measurements = []
 # save the image data from Udacity and the steering angle, the flipped image of the original image should also be saved
-for line in lines[:length_original]:
-	image_flip(line, '../../ubuntu/IMG/')
-print(len(images))
-
-# save the image data with the simulator by myself and the steering angle, the flipped image of the original image should also be saved
-for line in lines[length_original:]:
-	image_flip_central(line, '../../ubuntu/added_data/IMG/')
-
+for line in lines:
+	image_flip(line, '../../ubuntu/data/IMG/')
 print(len(images))
 
 def cropping(img):
@@ -207,7 +153,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.001
-rate_dropout = 0.2
+rate_dropout = 0.5
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
@@ -221,17 +167,17 @@ model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regul
 model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
 #model.add(Dropout(rate_dropout))
 model.add(Flatten())
-#model.add(Dropout(rate_dropout))
+model.add(Dropout(rate_dropout))
 model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(Dropout(rate_dropout))
+model.add(Dropout(rate_dropout))
 model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(Dropout(rate_dropout))
+model.add(Dropout(rate_dropout))
 model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 model.add(Dropout(rate_dropout))
 model.add(Dense(1))
 
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=17)
+model.fit_generator(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=17)
 
 model.save('model.h5')
