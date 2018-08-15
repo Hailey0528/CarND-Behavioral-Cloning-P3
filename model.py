@@ -6,6 +6,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 from PIL import Image
+from keras.models import Sequential, Model
+from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
+from keras.regularizers import l2, activity_l2
+from keras.layers.convolutional import Convolution2D
+from keras.layers.pooling import MaxPooling2D
 
 
 lines = []
@@ -146,11 +151,6 @@ plt.ylabel('number of images')
 Distribution.savefig('image/Angle_Distribution.jpg')
 
 ##### model architecture#####
-from keras.models import Sequential, Model
-from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
-from keras.regularizers import l2, activity_l2
-from keras.layers.convolutional import Convolution2D
-from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.001
 rate_dropout = 0.5
