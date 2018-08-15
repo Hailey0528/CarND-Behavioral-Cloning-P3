@@ -1,98 +1,84 @@
 import csv
 import cv2
-import pandas
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 from PIL import Image
-from keras.models import Sequential, Model
-from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
-from keras.regularizers import l2, activity_l2
-from keras.layers.convolutional import Convolution2D
-from keras.layers.pooling import MaxPooling2D
-
-
+import pandas
 lines = []
 ### get the informations from csv file of data of Udacity
-with open('../../ubuntu/data/driving_log.csv') as csvfile:
+with open('../../ubuntu/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
 # print the number of the lines
 print(len(lines))
-#colnames = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
+# Read the columns from driving_log.csv 
+columns = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
+data = pandas.read_csv('../../ubuntu/driving_log.csv', skiprows=[0], names=columns)
+center = data.center.tolist()
+center_recover = data.center.tolist() 
+left = data.left.tolist()
+right = data.right.tolist()
+steering = data.steering.tolist()
+steering_recover = data.steering.tolist()
 
-### read the images with the folderName and the information 
-### for example, the name of image from the central camera, left camera, right camera, the sterring angle. 
-### read every image and flip the image, and 
-def image_flip(line, folderName):
-	delta_angle = 0.2
-	angle = float(line[3])
+#  Shuffle center and steering. Use 10% of central images and steering angles for validation.
+center, steering = shuffle(center, steering)
+center, X_valid, steering, y_valid = train_test_split(center, steering, test_size = 0.10, random_state = 100) 
 
-	#####for the central camera#####
-	source_path = line[0]
-	# get the image name from the csv file
-	filename = source_path.split('/')[-1]
-	# create the path of the image
-	current_path = folderName + filename
-	# read the image
-	image = cv2.imread(current_path)
-	# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-	# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-	if image is not None:			
-		# save the image data from central camera and the steering angle
-		images.append(image)	
-		measurements.append(angle)
-		# flip the image from central camera
-		image_flip = np.fliplr(image)
-		# save the flipped image data and the corresponding steering angle
-		#images.append(image_flip)
-		#measurements.append(-angle)
-	if angle>0.15:
-		#####for the left camera#####
-		source_path = line[1] 
-		# get the image name from the csv file
-		filename = source_path.split('/')[-1]
-		# create the path of the image
-		current_path = folderName + filename
-		# read the image	
-		image_left = cv2.imread(current_path)
-		# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-		# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-		if image_left is not None:
-			# save the image data from left camera and the steering angle
-			images.append(image_left)
-			measurements.append(angle+delta_angle)
-			#flip the image from left camera and save the image and corresponding steering angle
-			images.append(np.fliplr(image_left))
-			measurements.append(-delta_angle-angle)
-	if angle<-0.15:
-		#####for the right camera#####
-		source_path = line[2] 
-		# get the image name from the csv file
-		filename = source_path.split('/')[-1]
-		# create the path of the image
-		current_path = folderName + filename
-		# read the image
-		image_right = cv2.imread(current_path)
-		# If there is image with this name, then append the image data to the image array and the steering angle to the steering angle array
-		# flip this image and steering angle, then append the flipped image into the image array and corresponding steering angle to the steering angle array
-		if image_right is not None:		
-			# save the image data from right camera and the steering angle
-			images.append(image_right)
-			measurements.append(angle-delta_angle)
-			#flip the image from right camera and save the image and corresponding steering angle
-			images.append(np.fliplr(image_right))
-			measurements.append(-angle+delta_angle)
-		
-images = []
-measurements = []
-# save the image data from Udacity and the steering angle, the flipped image of the original image should also be saved
-for line in lines:
-	image_flip(line, '../../ubuntu/data/IMG/')
-print(len(images))
+# Divide the training data into 3 groups based on the steering angle >0.15, <-0.15, or between -0.15 and 0.15
+img_center, img_left, img_right = [], [], []
+steer_center, steer_left, steer_right = [], [], []
+
+for i in steering:
+  index=steering.index(i)
+  if i > 0.15:
+    img_right.append(center[index])
+    steer_right.append(i)
+  if i < -0.15:
+    img_left.append(center[index])
+    steer_left.append(i)
+  else:
+    img_center.append(center[index])
+    steer_center.append(i)
+
+# add recovery
+center_size, left_size, right_size = len(img_center), len(img_left),len(img_right)
+main_size = math.ceil(len(center_recover))
+l_add = center_size-left_size
+r_add = center_size-right_size
+
+# Generate random list of indices for left and right recovery images
+indice_L = random.sample(range(main_size), l_add)
+indice_R = random.sample(range(main_size), r_add)
+
+delta_angle = 0.2
+# Filter angle less than -0.15 and add right camera images into driving left list, minus an adjustment angle #
+for i in indice_L:
+  if steering_recover[i] < -0.15:
+    img_left.append(right[i])
+    steer_left.append(steering_recover[i] - delta_angle)
+
+# Filter angle more than 0.15 and add left camera images into driving right list, add an adjustment angle #  
+for i in indice_R:
+  if steering_recover[i] > 0.15:
+    img_right.append(left[i])
+    steer_right.append(steering_recover[i] + delta_angle)
+
+## COMBINE TRAINING IMAGE NAMES AND ANGLES INTO X_train and y_train ##  
+img_train = img_center + img_left + img_right
+steering_train = np.float32(steer_straight + steer_left + steer_right)
+
+X_train = []
+y_train = []
+for i in len(img_train):
+    image = cv2.imread('../../ubuntu/added_data/IMG/'+img_train[i])
+    X_train.append(image)
+    y_train.append(steering_train[i])
+    X_train.append(np.fliplr(image))
+    y_train.append(-steering_train[i]) 
 
 def cropping(img):
 	#cropping the image for important informations with the number of pixels, which should be cropped in every side
@@ -125,9 +111,7 @@ def preprocessing(img):
 		image_Preprocessing.append(image)		
 	return image_Preprocessing
 
-#get the input train and validation data, and the expected output of the model
-X_train = np.array(preprocessing(images))
-y_train = np.array(measurements)
+
 
 ##### show visualzition of data, preprocessing #####
 #show the distribution of training data
@@ -151,9 +135,14 @@ plt.ylabel('number of images')
 Distribution.savefig('image/Angle_Distribution.jpg')
 
 ##### model architecture#####
+from keras.models import Sequential, Model
+from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
+from keras.regularizers import l2, activity_l2
+from keras.layers.convolutional import Convolution2D
+from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.001
-rate_dropout = 0.5
+rate_dropout = 0.2
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
@@ -178,6 +167,6 @@ model.add(Dense(1))
 
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=17)
 
 model.save('model.h5')
