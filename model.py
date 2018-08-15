@@ -10,7 +10,7 @@ from PIL import Image
 
 lines = []
 ### get the informations from csv file of data of Udacity
-with open('../../ubuntu/driving_log.csv') as csvfile:
+with open('../../ubuntu/data/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
