@@ -48,8 +48,8 @@ def image_flip(line, folderName):
 		# flip the image from central camera
 		image_flip = np.fliplr(image)
 		# save the flipped image data and the corresponding steering angle
-		images.append(image_flip)
-		measurements.append(-angle)
+		#images.append(image_flip)
+		#measurements.append(-angle)
 	if angle>0.15:
 		#####for the left camera#####
 		source_path = line[1] 
@@ -66,8 +66,8 @@ def image_flip(line, folderName):
 			images.append(image_left)
 			measurements.append(angle+delta_angle)
 			#flip the image from left camera and save the image and corresponding steering angle
-			images.append(np.fliplr(image_left))
-			measurements.append(-delta_angle-angle)
+			#images.append(np.fliplr(image_left))
+			#measurements.append(-delta_angle-angle)
 	if angle<-0.15:
 		#####for the right camera#####
 		source_path = line[2] 
@@ -84,8 +84,8 @@ def image_flip(line, folderName):
 			images.append(image_right)
 			measurements.append(angle-delta_angle)
 			#flip the image from right camera and save the image and corresponding steering angle
-			images.append(np.fliplr(image_right))
-			measurements.append(-angle+delta_angle)
+			#images.append(np.fliplr(image_right))
+			#measurements.append(-angle+delta_angle)
 		
 images = []
 measurements = []
