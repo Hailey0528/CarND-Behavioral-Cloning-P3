@@ -5,18 +5,13 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 from PIL import Image
 import pandas
-lines = []
-### get the informations from csv file of data of Udacity
-with open('../../ubuntu/driving_log.csv') as csvfile:
-    next(csvfile, None)
-    reader = csv.reader(csvfile)
-    for line in reader:
-        lines.append(line)
-# print the number of the lines
-print(len(lines))
+import random
+import math
+from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
 # Read the columns from driving_log.csv 
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
-data = pandas.read_csv('../../ubuntu/driving_log.csv', skiprows=[0], names=columns)
+data = pandas.read_csv('../../ubuntu/data/driving_log.csv', skiprows=[0], names=columns)
 center = data.center.tolist()
 center_recover = data.center.tolist() 
 left = data.left.tolist()
@@ -69,12 +64,63 @@ for i in indice_R:
 
 ## COMBINE TRAINING IMAGE NAMES AND ANGLES INTO X_train and y_train ##  
 img_train = img_center + img_left + img_right
-steering_train = np.float32(steer_straight + steer_left + steer_right)
+steering_train = np.float32(steer_center + steer_left + steer_right)
+print(img_train)
+'''Trains a simple deep NN on the MNIST dataset.
+Gets to 98.40% test accuracy after 20 epochs
+(there is *a lot* of margin for parameter tuning).
+2 seconds per epoch on a K520 GPU.
+'''
 
+from __future__ import print_function
+
+import keras
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import RMSprop
+
+
+batch_size = 128
+num_classes = 10
+epochs = 20
+
+# the data, shuffled and split between train and test sets
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+x_train = x_train.reshape(60000, 784)
+x_test = x_test.reshape(10000, 784)
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train /= 255
+x_test /= 255
+print(x_train.shape[0], 'train samples')
+print(x_test.shape[0], 'test samples')
+
+# convert class vectors to binary class matrices
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+
+model = Sequential()
+model.add(Dense(512, activation='relu', input_shape=(784,)))
+model.add(Dropout(0.2))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(10, activation='softmax'))
+
+model.summary()
+
+model.compile(loss='categorical_crossentropy',
+              optimizer=RMSprop(),
+              metrics=['accuracy'])
+
+history = model.fit(x_train, y_train,
+                    batch_size=batch_size,
 X_train = []
 y_train = []
-for i in len(img_train):
-    image = cv2.imread('../../ubuntu/added_data/IMG/'+img_train[i])
+for i in range(len(img_train)):
+    image = cv2.imread('../../ubuntu/data/IMG/'+img_train[i])
+    #print(image.shape)    
     X_train.append(image)
     y_train.append(steering_train[i])
     X_train.append(np.fliplr(image))
