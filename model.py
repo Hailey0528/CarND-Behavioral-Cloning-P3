@@ -48,8 +48,8 @@ def image_flip(line, folderName):
 		# flip the image from central camera
 		image_flip = np.fliplr(image)
 		# save the flipped image data and the corresponding steering angle
-		images.append(image_flip)
-		measurements.append(-angle)
+		#images.append(image_flip)
+		#measurements.append(-angle)
 	if angle>0.15:
 		#####for the left camera#####
 		source_path = line[1] 
