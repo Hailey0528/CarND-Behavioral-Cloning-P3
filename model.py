@@ -50,7 +50,7 @@ def image_flip(line, folderName):
 		# save the flipped image data and the corresponding steering angle
 		images.append(image_flip)
 		measurements.append(-angle)
-	if angle<-0.15:
+	if angle>0.15:
 		#####for the left camera#####
 		source_path = line[1] 
 		# get the image name from the csv file
@@ -68,7 +68,7 @@ def image_flip(line, folderName):
 			#flip the image from left camera and save the image and corresponding steering angle
 			images.append(np.fliplr(image_left))
 			measurements.append(-delta_angle-angle)
-	if angle>0.15:
+	if angle<-0.15:
 		#####for the right camera#####
 		source_path = line[2] 
 		# get the image name from the csv file
@@ -167,11 +167,11 @@ model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regul
 model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
 #model.add(Dropout(rate_dropout))
 model.add(Flatten())
-model.add(Dropout(rate_dropout))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-model.add(Dropout(rate_dropout))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-model.add(Dropout(rate_dropout))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 model.add(Dropout(rate_dropout))
 model.add(Dense(1))
