@@ -62,8 +62,8 @@ for i in indice_R:
     steer_right.append(steering_recover[i] + delta_angle)
 
 ## COMBINE TRAINING IMAGE NAMES AND ANGLES INTO X_train and y_train ##  
-img_train = img_center + img_left + img_right
-steering_train = np.float32(steer_center + steer_left + steer_right)
+X_train = img_center + img_left + img_right
+y_train = np.float32(steer_center + steer_left + steer_right)
 
 import keras
 from keras.datasets import mnist
@@ -75,16 +75,6 @@ from keras.optimizers import RMSprop
 batch_size = 128
 num_classes = 10
 epochs = 20
-
-X_train = []
-y_train = []
-
-for i in range(len(img_train)):
-    image = cv2.imread('../../ubuntu/data/'+img_train[i])   
-    X_train.append(image)
-    y_train.append(steering_train[i])
-    #X_train.append(np.fliplr(image))
-    #y_train.append(-steering_train[i]) 
 
 def cropping(img):
 	#cropping the image for important informations with the number of pixels, which should be cropped in every side
