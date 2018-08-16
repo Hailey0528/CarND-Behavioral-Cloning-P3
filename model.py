@@ -104,7 +104,7 @@ def generator(batch_size):
               index = int(np.random.choice(len(data), 1))
               img=cv2.imread('../../ubuntu/data/'+data[index])
               batch_train[i] = resizing(cropping(random_brightness(img)))
-              batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
+              batch_angle[i] = angle[index]*(1+np.random.uniform(-0.10,0.10))
               flip_coin = random.randint(0, 1)
               if flip_coin==1:
                  batch_train[i] = np.fliplr(batch_train[i])
@@ -167,7 +167,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.001
-rate_dropout = 0.8
+rate_dropout = 0.2
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
@@ -192,7 +192,7 @@ model.add(Dense(1))
 
 
 batch_size = 128
-epoch_number = 10
+epoch_number = 2
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.fit_generator(generator(batch_size), samples_per_epoch = math.ceil(len(X_train)), nb_epoch=epoch_number, validation_data = generator_valid(batch_size), nb_val_samples = len(X_valid))
