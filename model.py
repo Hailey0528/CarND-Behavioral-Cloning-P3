@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 # Read the columns from driving_log.csv 
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
-data = pandas.read_csv('../../ubuntu/data/driving_log.csv', skiprows=[0], names=columns)
+data = pandas.read_csv('../../Documents/data/driving_log.csv', skiprows=[0], skipinitialspace=True,names=columns)
 center = data.center.tolist()
 center_recover = data.center.tolist() 
 left = data.left.tolist()
@@ -23,7 +23,6 @@ steering_recover = data.steering.tolist()
 #  Shuffle center and steering. Use 10% of central images and steering angles for validation.
 center, steering = shuffle(center, steering)
 center, X_valid, steering, y_valid = train_test_split(center, steering, test_size = 0.10, random_state = 100) 
-
 # Divide the training data into 3 groups based on the steering angle >0.15, <-0.15, or between -0.15 and 0.15
 img_center, img_left, img_right = [], [], []
 steer_center, steer_left, steer_right = [], [], []
@@ -48,7 +47,7 @@ r_add = center_size-right_size
 # Generate random list of indices for left and right recovery images
 indice_L = random.sample(range(main_size), l_add)
 indice_R = random.sample(range(main_size), r_add)
-
+#print(indice_L, indice_R)
 delta_angle = 0.2
 # Filter angle less than -0.15 and add right camera images into driving left list, minus an adjustment angle #
 for i in indice_L:
@@ -66,7 +65,6 @@ for i in indice_R:
 img_train = img_center + img_left + img_right
 steering_train = np.float32(steer_center + steer_left + steer_right)
 
-
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -80,14 +78,13 @@ epochs = 20
 
 X_train = []
 y_train = []
-image = cv2.imread('../../ubuntu/data/IMG/'+img_train0])
+
 for i in range(len(img_train)):
-    image = cv2.imread('../../ubuntu/data/IMG/'+img_train[i])
-    #print(image.shape)    
+    image = cv2.imread('../../Documents/data/'+img_train[i])   
     X_train.append(image)
     y_train.append(steering_train[i])
-    X_train.append(np.fliplr(image))
-    y_train.append(-steering_train[i]) 
+    #X_train.append(np.fliplr(image))
+    #y_train.append(-steering_train[i]) 
 
 def cropping(img):
 	#cropping the image for important informations with the number of pixels, which should be cropped in every side
@@ -120,7 +117,9 @@ def preprocessing(img):
 		image_Preprocessing.append(image)		
 	return image_Preprocessing
 
-
+#get the input train and validation data, and the expected output of the model
+X_train = np.array(preprocessing(X_train))
+y_train = np.array(y_train)
 
 ##### show visualzition of data, preprocessing #####
 #show the distribution of training data
@@ -143,6 +142,16 @@ plt.xlabel('number of class')
 plt.ylabel('number of images')
 Distribution.savefig('image/Angle_Distribution.jpg')
 
+
+## generate data
+def generator(batch_size):
+    batch_train = np.zeros((batch_size, 64, 64, 3))
+    while True:
+          data, angle = shuffle(X_train, y_train)
+          for i in range(batch_size):
+              index = int(np.random.choice(len(data), 1))
+              batch_train[i] = 
+    image = cv2.flip(image, 1)
 ##### model architecture#####
 from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
