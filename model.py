@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 # Read the columns from driving_log.csv 
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
-data = pandas.read_csv('../../Documents/data/driving_log.csv', skiprows=[0], skipinitialspace=True,names=columns)
+data = pandas.read_csv('../../ubuntu/data/driving_log.csv', skiprows=[0], skipinitialspace=True,names=columns)
 center = data.center.tolist()
 center_recover = data.center.tolist() 
 left = data.left.tolist()
@@ -48,7 +48,7 @@ r_add = center_size-right_size
 indice_L = random.sample(range(main_size), l_add)
 indice_R = random.sample(range(main_size), r_add)
 #print(indice_L, indice_R)
-delta_angle = 0.2
+delta_angle = 0.27
 # Filter angle less than -0.15 and add right camera images into driving left list, minus an adjustment angle #
 for i in indice_L:
   if steering_recover[i] < -0.15:
@@ -80,7 +80,7 @@ X_train = []
 y_train = []
 
 for i in range(len(img_train)):
-    image = cv2.imread('../../Documents/data/'+img_train[i])   
+    image = cv2.imread('../../ubuntu/data/'+img_train[i])   
     X_train.append(image)
     y_train.append(steering_train[i])
     #X_train.append(np.fliplr(image))
@@ -144,14 +144,14 @@ Distribution.savefig('image/Angle_Distribution.jpg')
 
 
 ## generate data
-def generator(batch_size):
-    batch_train = np.zeros((batch_size, 64, 64, 3))
-    while True:
-          data, angle = shuffle(X_train, y_train)
-          for i in range(batch_size):
-              index = int(np.random.choice(len(data), 1))
-              batch_train[i] = 
-    image = cv2.flip(image, 1)
+#def generator(batch_size):
+    #batch_train = np.zeros((batch_size, 64, 64, 3))
+    #while True:
+        #  data, angle = shuffle(X_train, y_train)
+       #   for i in range(batch_size):
+      #        index = int(np.random.choice(len(data), 1))
+     #         batch_train[i] = 
+    #image = cv2.flip(image, 1)
 ##### model architecture#####
 from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
