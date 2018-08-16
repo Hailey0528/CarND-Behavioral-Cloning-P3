@@ -22,7 +22,7 @@ steering_recover = data.steering.tolist()
 
 #  Shuffle center and steering. Use 10% of central images and steering angles for validation.
 center, steering = shuffle(center, steering)
-center, X_valid, steering, y_valid = train_test_split(center, steering, test_size = 0.15, random_state = 100) 
+center, X_valid, steering, y_valid = train_test_split(center, steering, test_size = 0.2, random_state = 100) 
 # Divide the training data into 3 groups based on the steering angle >0.15, <-0.15, or between -0.15 and 0.15
 img_center, img_left, img_right = [], [], []
 steer_center, steer_left, steer_right = [], [], []
@@ -48,7 +48,7 @@ r_add = center_size-right_size
 indice_L = random.sample(range(main_size), l_add)
 indice_R = random.sample(range(main_size), r_add)
 #print(indice_L, indice_R)
-delta_angle = 0.2
+delta_angle = 0.3
 # Filter angle less than -0.15 and add right camera images into driving left list, minus an adjustment angle #
 for i in indice_L:
   if steering_recover[i] < -0.15:
@@ -186,7 +186,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.001
-rate_dropout = 0.2
+rate_dropout = 0.5
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
@@ -202,16 +202,16 @@ model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regul
 model.add(Flatten())
 #model.add(Dropout(rate_dropout))
 model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(Dropout(rate_dropout))
-model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
-#model.add(Dropout(rate_dropout))
-model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 model.add(Dropout(rate_dropout))
+model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+model.add(Dropout(rate_dropout))
+model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
+#model.add(Dropout(rate_dropout))
 model.add(Dense(1))
 
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit_generator(generator(batch_size), samples_per_epoch = math.ceil(len(X_train)), nb_epoch=2, validation_data = generator_valid(batch_size), nb_val_samples = len(X_valid))
+model.fit_generator(generator(batch_size), samples_per_epoch = math.ceil(len(X_train)), nb_epoch=10, validation_data = generator_valid(batch_size), nb_val_samples = len(X_valid))
 
 
 model.save('model.h5')
