@@ -124,13 +124,13 @@ def generator(batch_size):
               # random choose one image in train data and read it
               index = int(np.random.choice(len(data), 1))
               img=cv2.imread(data[index])
-	      batch_train[i] = resizing(cropping(random_brightness(img)))
+              batch_train[i] = resizing(cropping(random_brightness(img)))
               batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
-	      flip_coin = random.randint(0, 1)
-	      if flip_coin==1:
-		batch_train[i] = np.fliplr(batch_train[i])
-		batch_angle[i] = -batch_angle[i]
-	yield batch_train, batch_angle
+              flip_coin = random.randint(0, 1)
+              if flip_coin==1:
+                 batch_train[i] = np.fliplr(batch_train[i])
+                 batch_angle[i] = -batch_angle[i]
+        yield batch_train, batch_angle
 	
 def generator_valid(batch_size):
     batch_valid = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
