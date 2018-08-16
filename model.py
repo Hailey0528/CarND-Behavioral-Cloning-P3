@@ -132,7 +132,7 @@ def generator(batch_size):
                  batch_angle[i] = -batch_angle[i]
         yield batch_train, batch_angle
 	
-def generator_valid(batch_size):
+def generator(batch_size):
     batch_valid = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
     batch_angle = np.zeros((batch_size), dtype=np.float32)
     while True:
@@ -141,9 +141,9 @@ def generator_valid(batch_size):
               # random choose one image in train data and read it
               index = int(np.random.choice(len(data), 1))
               img=cv2.imread(data[index])
-	      batch_train[i] = resizing(cropping(img))
+              batch_valid[i] = resizing(cropping(img))
               batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
-	yield batch_train, batch_angle
+        yield batch_valid, batch_angle
 	
 def preprocessing(img):
 	image_Preprocessing = []
