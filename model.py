@@ -121,7 +121,9 @@ def generator(batch_size):
                  batch_train[i] = np.fliplr(batch_train[i])
                  batch_angle[i] = -batch_angle[i]
         yield batch_train, batch_angle
-	
+a, b = generator(2)
+print(a)
+print(b)
 def generator_valid(batch_size):
     batch_valid = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
     batch_angle = np.zeros((batch_size), dtype=np.float32)
