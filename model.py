@@ -113,7 +113,7 @@ def generator(batch_size):
         for i in range(batch_size):
               # random choose one image in train data and read it
               index = int(np.random.choice(len(data), 1))
-              img=cv2.imread('../../ubuntu/data/+data[index])
+              img=cv2.imread('../../ubuntu/data/'+data[index])
               batch_train[i] = resizing(cropping(random_brightness(img)))
               batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
               flip_coin = random.randint(0, 1)
@@ -121,9 +121,9 @@ def generator(batch_size):
                  batch_train[i] = np.fliplr(batch_train[i])
                  batch_angle[i] = -batch_angle[i]
         yield batch_train, batch_angle
-a, b = generator(2)
-print(a)
-print(b)
+#ha, ma = generator(2)
+#print(ha)
+#print(ma)
 def generator_valid(batch_size):
     batch_valid = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
     batch_angle = np.zeros((batch_size), dtype=np.float32)
@@ -132,7 +132,7 @@ def generator_valid(batch_size):
         for i in range(batch_size):
               # random choose one image in train data and read it
               index = int(np.random.choice(len(data), 1))
-              img=cv2.imread('../../ubuntu/data/+data[index])
+              img=cv2.imread('../../ubuntu/data/'+data[index])
               batch_valid[i] = resizing(cropping(img))
               batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
         yield batch_valid, batch_angle
