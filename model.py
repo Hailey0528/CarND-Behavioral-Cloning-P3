@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 # Read the columns from driving_log.csv 
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'brake', 'speed']
-data = pandas.read_csv('../../ubuntu/data/driving_log.csv', skiprows=[0], skipinitialspace=True,names=columns)
+data = pandas.read_csv('../../ubuntu/data/driving_log.csv', skiprows=[0], skipinitialspace=True, names=columns)
 center = data.center.tolist()
 center_recover = data.center.tolist() 
 left = data.left.tolist()
@@ -113,7 +113,7 @@ def generator(batch_size):
         for i in range(batch_size):
               # random choose one image in train data and read it
               index = int(np.random.choice(len(data), 1))
-              img=cv2.imread(data[index].strip())
+              img=cv2.imread('../../ubuntu/data/+data[index])
               batch_train[i] = resizing(cropping(random_brightness(img)))
               batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
               flip_coin = random.randint(0, 1)
@@ -130,7 +130,7 @@ def generator_valid(batch_size):
         for i in range(batch_size):
               # random choose one image in train data and read it
               index = int(np.random.choice(len(data), 1))
-              img=cv2.imread(data[index].strip())
+              img=cv2.imread('../../ubuntu/data/+data[index])
               batch_valid[i] = resizing(cropping(img))
               batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
         yield batch_valid, batch_angle
