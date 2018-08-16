@@ -22,7 +22,7 @@ steering_recover = data.steering.tolist()
 
 #  Shuffle center and steering. Use 10% of central images and steering angles for validation.
 center, steering = shuffle(center, steering)
-center, X_valid, steering, y_valid = train_test_split(center, steering, test_size = 0.10, random_state = 100) 
+center, X_valid, steering, y_valid = train_test_split(center, steering, test_size = 0.15, random_state = 100) 
 # Divide the training data into 3 groups based on the steering angle >0.15, <-0.15, or between -0.15 and 0.15
 img_center, img_left, img_right = [], [], []
 steer_center, steer_left, steer_right = [], [], []
@@ -48,7 +48,7 @@ r_add = center_size-right_size
 indice_L = random.sample(range(main_size), l_add)
 indice_R = random.sample(range(main_size), r_add)
 #print(indice_L, indice_R)
-delta_angle = 0.27
+delta_angle = 0.2
 # Filter angle less than -0.15 and add right camera images into driving left list, minus an adjustment angle #
 for i in indice_L:
   if steering_recover[i] < -0.15:
@@ -103,6 +103,48 @@ def resizing(img):
 	img_resize = cv2.resize(img, (new_width,new_height))
 	return img_resize
 
+# Generate random brightness function, produce darker transformation 
+def random_brightness(image):
+    #Convert 2 HSV colorspace from RGB colorspace
+    hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    #Generate new random brightness
+    rand = random.uniform(0.3,1.0)
+    hsv[:,:,2] = rand*hsv[:,:,2]
+    #Convert back to RGB colorspace
+    new_img = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+    return new_img 
+
+## generate data
+def generator(batch_size):
+    batch_train = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
+    batch_angle = np.zeros((batch_size), dtype=np.float32)
+    while True:
+        data, angle = shuffle(X_train, y_train)
+        for i in range(batch_size):
+              # random choose one image in train data and read it
+              index = int(np.random.choice(len(data), 1))
+              img=cv2.imread(data[index])
+	      batch_train[i] = resizing(cropping(random_brightness(img)))
+              batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
+	      flip_coin = random.randint(0, 1)
+	      if flip_coin==1:
+		batch_train[i] = np.fliplr(batch_train[i])
+		batch_angle[i] = -batch_angle[i]
+	yield batch_train, batch_angle
+	
+def generator_valid(batch_size):
+    batch_valid = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
+    batch_angle = np.zeros((batch_size), dtype=np.float32)
+    while True:
+        data, angle = shuffle(X_valid, y_valid)
+        for i in range(batch_size):
+              # random choose one image in train data and read it
+              index = int(np.random.choice(len(data), 1))
+              img=cv2.imread(data[index])
+	      batch_train[i] = resizing(cropping(img))
+              batch_angle[i] = angle[index]#*(1+np.random.uniform(-0.10,0.10))
+	yield batch_train, batch_angle
+	
 def preprocessing(img):
 	image_Preprocessing = []
 	n_training = len(img)
@@ -118,8 +160,8 @@ def preprocessing(img):
 	return image_Preprocessing
 
 #get the input train and validation data, and the expected output of the model
-X_train = np.array(preprocessing(X_train))
-y_train = np.array(y_train)
+#X_train = np.array(preprocessing(X_train))
+#y_train = np.array(y_train)
 
 ##### show visualzition of data, preprocessing #####
 #show the distribution of training data
@@ -143,15 +185,7 @@ plt.ylabel('number of images')
 Distribution.savefig('image/Angle_Distribution.jpg')
 
 
-## generate data
-#def generator(batch_size):
-    #batch_train = np.zeros((batch_size, 64, 64, 3))
-    #while True:
-        #  data, angle = shuffle(X_train, y_train)
-       #   for i in range(batch_size):
-      #        index = int(np.random.choice(len(data), 1))
-     #         batch_train[i] = 
-    #image = cv2.flip(image, 1)
+	
 ##### model architecture#####
 from keras.models import Sequential, Model
 from keras.layers import Flatten, Dense, Activation, Dropout, Lambda
@@ -185,6 +219,7 @@ model.add(Dense(1))
 
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=17)
+model.fit_generator(generator(Batch_size), samples_per_epoch = math.ceil(len(X_train)), nb_epoch=2, validation_data = generator_valid, nb_val_samples = len(X_valid))
+)
 
 model.save('model.h5')
