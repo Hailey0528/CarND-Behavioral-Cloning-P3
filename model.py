@@ -65,17 +65,6 @@ for i in indice_R:
 X_train = img_center + img_left + img_right
 y_train = np.float32(steer_center + steer_left + steer_right)
 
-import keras
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.optimizers import RMSprop
-
-
-batch_size = 128
-num_classes = 10
-epochs = 20
-
 def cropping(img):
 	#cropping the image for important informations with the number of pixels, which should be cropped in every side
 	number_top = 50
@@ -121,9 +110,7 @@ def generator(batch_size):
                  batch_train[i] = np.fliplr(batch_train[i])
                  batch_angle[i] = -batch_angle[i]
         yield batch_train, batch_angle
-#ha, ma = generator(2)
-#print(ha)
-#print(ma)
+
 def generator_valid(batch_size):
     batch_valid = np.zeros((batch_size, 66, 220, 3), dtype=np.float32)
     batch_angle = np.zeros((batch_size), dtype=np.float32)
@@ -151,10 +138,6 @@ def preprocessing(img):
 		image_Preprocessing.append(image)		
 	return image_Preprocessing
 
-#get the input train and validation data, and the expected output of the model
-#X_train = np.array(preprocessing(X_train))
-#y_train = np.array(y_train)
-
 ##### show visualzition of data, preprocessing #####
 #show the distribution of training data
 Angle_Min = min(y_train)
@@ -175,8 +158,6 @@ plt.title('Distribution')
 plt.xlabel('number of class')
 plt.ylabel('number of images')
 Distribution.savefig('image/Angle_Distribution.jpg')
-
-
 	
 ##### model architecture#####
 from keras.models import Sequential, Model
@@ -186,7 +167,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 sigma = 0.001
-rate_dropout = 0.5
+rate_dropout = 0.8
 model = Sequential()
 model.add(Lambda(lambda x:x/255.0-0.5, input_shape=(66, 220, 3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
@@ -200,7 +181,7 @@ model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regul
 model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', W_regularizer=l2(sigma),b_regularizer=l2(sigma),  activation='relu'))
 #model.add(Dropout(rate_dropout))
 model.add(Flatten())
-#model.add(Dropout(rate_dropout))
+model.add(Dropout(rate_dropout))
 model.add(Dense(100, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
 model.add(Dropout(rate_dropout))
 model.add(Dense(50, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation='relu'))
@@ -209,9 +190,12 @@ model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation
 #model.add(Dropout(rate_dropout))
 model.add(Dense(1))
 
+
+batch_size = 128
+epoch_number = 10
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-model.fit_generator(generator(batch_size), samples_per_epoch = math.ceil(len(X_train)), nb_epoch=10, validation_data = generator_valid(batch_size), nb_val_samples = len(X_valid))
+model.fit_generator(generator(batch_size), samples_per_epoch = math.ceil(len(X_train)), nb_epoch=epoch_number, validation_data = generator_valid(batch_size), nb_val_samples = len(X_valid))
 
 
 model.save('model.h5')
