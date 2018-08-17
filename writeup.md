@@ -12,10 +12,13 @@
 [image4]: ./image/Angle_Distribution.jpg "Angle_Distribution.jpg"
 
 ### Files
-model.py 
-model.h5
-drive.py
-video.py
+model.py: training file
+
+model.h5: training weight
+
+drive.py: drive model
+
+video.py: test run
 
 ### Model Architecture and Training Strategy
 
