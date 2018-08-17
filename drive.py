@@ -49,7 +49,7 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 20
+set_speed = 9
 controller.set_desired(set_speed)                                          
 
 def cropping(img):
@@ -69,6 +69,18 @@ def resizing(img):
 	img_resize = cv2.resize(img, (new_width,new_height))
 	return img_resize
 
+def preprocessing(img):
+
+
+	# for every image, crop the iamge
+	image = cropping(img)
+	# resize the image
+	image = resizing(image)
+	# change the BGR image to YUV image
+	image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+	# save the image to the array for image data set
+
+	return image
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -83,7 +95,7 @@ def telemetry(sid, data):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
-        image_preprocess = resizing(cropping(image_array))
+        image_preprocess = preprocessing(image_array)
         steering_angle = float(model.predict(image_preprocess[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
@@ -130,8 +142,8 @@ if __name__ == '__main__':
         type=str,
         nargs='?',
         default='',
-	# help = '../../Desktop'
-        help='Path to image folder. This is where the images from the run will be saved.'
+	help = '../../Desktop'
+        #help='Path to image folder. This is where the images from the run will be saved.'
     )
     args = parser.parse_args()
 
