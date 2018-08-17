@@ -191,7 +191,7 @@ model.add(Dense(10, W_regularizer=l2(sigma), b_regularizer=l2(sigma), activation
 model.add(Dense(1))
 
 
-batch_size = 128
+batch_size = 64
 epoch_number = 2
 ##### compile #####
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])

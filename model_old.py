@@ -7,7 +7,7 @@ from PIL import Image
 
 lines = []
 ### get the informations from csv file of data of Udacity
-with open('../../ubuntu/driving_log.csv') as csvfile:
+with open('../../ubuntu/data/driving_log.csv') as csvfile:
     next(csvfile, None)
     reader = csv.reader(csvfile)
     for line in reader:
@@ -20,8 +20,8 @@ print(len(lines))
 ### for example, the name of image from the central camera, left camera, right camera, the sterring angle. 
 ### read every image and flip the image, and 
 def image_flip(line, folderName):
-	delta_left = 0.3
-	delta_right=0.4
+	delta_left = 0.2
+	delta_right=0.2
 	angle = float(line[3])
 
 	#####for the central camera#####
@@ -84,7 +84,7 @@ images = []
 measurements = []
 # save the image data from Udacity and the steering angle, the flipped image of the original image should also be saved
 for line in lines:
-	image_flip(line, '../../ubuntu/IMG/')
+	image_flip(line, '../../ubuntu/data/IMG/')
 print(len(images))
 
 
